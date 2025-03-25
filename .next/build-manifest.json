@@ -1,13 +1,12 @@
 {
   "pages": {
     "/": [
-      "static/chunks/node_modules_next_756a798c._.js",
+      "static/chunks/node_modules_next_36f2f2e6._.js",
       "static/chunks/node_modules_react-dom_82bb97c6._.js",
       "static/chunks/node_modules_1b7400a8._.js",
-      "static/chunks/[root of the server]__87cb2da2._.js",
-      "static/chunks/[next]_internal_font_google_329118ac._.css",
+      "static/chunks/[root of the server]__1648cdea._.js",
       "static/chunks/src_pages_index_5771e187._.js",
-      "static/chunks/src_pages_index_aae38c70._.js"
+      "static/chunks/src_pages_index_15004deb._.js"
     ],
     "/_app": [
       "static/chunks/node_modules_next_dist_eb81a647._.js",
@@ -17,6 +16,30 @@
       "static/chunks/src_styles_globals_4738091e.css",
       "static/chunks/src_pages__app_5771e187._.js",
       "static/chunks/src_pages__app_57e7673b._.js"
+    ],
+    "/_error": [
+      "static/chunks/[root of the server]__73499ecc._.js",
+      "static/chunks/node_modules_react-dom_82bb97c6._.js",
+      "static/chunks/node_modules_beb00741._.js",
+      "static/chunks/[root of the server]__ca38f087._.js",
+      "static/chunks/src_pages__error_5771e187._.js",
+      "static/chunks/src_pages__error_bac399eb._.js"
+    ],
+    "/add": [
+      "static/chunks/node_modules_next_f03d281e._.js",
+      "static/chunks/node_modules_react-dom_82bb97c6._.js",
+      "static/chunks/node_modules_1b7400a8._.js",
+      "static/chunks/[root of the server]__5a5d84db._.js",
+      "static/chunks/src_pages_add_index_tsx_5771e187._.js",
+      "static/chunks/src_pages_add_index_tsx_23f6eb1f._.js"
+    ],
+    "/edit/[id]": [
+      "static/chunks/node_modules_next_f03d281e._.js",
+      "static/chunks/node_modules_react-dom_82bb97c6._.js",
+      "static/chunks/node_modules_1b7400a8._.js",
+      "static/chunks/[root of the server]__084ed1f9._.js",
+      "static/chunks/src_pages_edit_[id]_tsx_5771e187._.js",
+      "static/chunks/src_pages_edit_[id]_tsx_e9b17c61._.js"
     ]
   },
   "devFiles": [],

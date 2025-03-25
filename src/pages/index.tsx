@@ -1,113 +1,135 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+// import Image from "next/image";
+// import { Geist, Geist_Mono } from "next/font/google";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
+
+import { useState, useEffect } from 'react';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { SearchBar } from '../components/SearchBar';
+import { AnimeCard } from '../components/AnimeCard';
+import { api } from '../services/api';
+
+interface Anime {
+  id: string;
+  title: string;
+  genre: string;
+}
 
 export default function Home() {
+  const router = useRouter();
+  const [animes, setAnimes] = useState<Anime[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Carrega os animes ao iniciar
+  useEffect(() => {
+    const loadAnimes = async () => {
+      try {
+        const response = await api.getAnimes();
+        setAnimes(response.data);
+      } catch (error) {
+        console.error('Erro ao carregar animes:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadAnimes();
+  }, []);
+
+  // Filtra os animes conforme o termo de busca
+  const filteredAnimes = animes.filter(
+    (anime) =>
+      anime.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      anime.genre.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await api.deleteAnime(id);
+      setAnimes(animes.filter((anime) => anime.id !== id));
+    } catch (error) {
+      console.error('Erro ao deletar:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center">
+        <p className="text-xl">Carregando...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <>
+      <Head>
+        <title>Catálogo de Animes</title>
+        <meta name="description" content="Gerencie sua coleção de animes" />
+      </Head>
+
+      <div className="min-h-screen bg-[#F8F9FA] p-6">
+        <div className="max-w-4xl mx-auto">
+          <header className="mb-8 text-center">
+            <h1 className="text-4xl font-bold text-[#EE0000] mb-2">
+              Meu Catálogo de Animes
+            </h1>
+            <p className="text-gray-600">
+              Gerencie sua lista de animes favoritos
+            </p>
+          </header>
+
+          <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-[#86A8E7]">
+            <SearchBar onSearch={handleSearch} />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              {filteredAnimes.map((anime) => (
+                <AnimeCard
+                  key={anime.id}
+                  id={anime.id}
+                  title={anime.title}
+                  genre={anime.genre}
+                  onEdit={(id) => router.push(`/edit/${id}`)}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+
+            <div className="mt-8 text-center">
+              <button
+                onClick={() => router.push('/add')}
+                className="bg-[#EE0000] text-white px-6 py-3 rounded-lg shadow-lg hover:bg-red-700 transition flex items-center mx-auto"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5 mr-2"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Adicionar Anime
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </>
   );
 }
