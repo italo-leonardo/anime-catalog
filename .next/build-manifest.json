@@ -17,14 +17,6 @@
       "static/chunks/src_pages__app_5771e187._.js",
       "static/chunks/src_pages__app_57e7673b._.js"
     ],
-    "/_error": [
-      "static/chunks/[root of the server]__73499ecc._.js",
-      "static/chunks/node_modules_react-dom_82bb97c6._.js",
-      "static/chunks/node_modules_beb00741._.js",
-      "static/chunks/[root of the server]__ca38f087._.js",
-      "static/chunks/src_pages__error_5771e187._.js",
-      "static/chunks/src_pages__error_bac399eb._.js"
-    ],
     "/add": [
       "static/chunks/node_modules_next_f03d281e._.js",
       "static/chunks/node_modules_react-dom_82bb97c6._.js",
@@ -32,14 +24,6 @@
       "static/chunks/[root of the server]__5a5d84db._.js",
       "static/chunks/src_pages_add_index_tsx_5771e187._.js",
       "static/chunks/src_pages_add_index_tsx_23f6eb1f._.js"
-    ],
-    "/edit/[id]": [
-      "static/chunks/node_modules_next_f03d281e._.js",
-      "static/chunks/node_modules_react-dom_82bb97c6._.js",
-      "static/chunks/node_modules_1b7400a8._.js",
-      "static/chunks/[root of the server]__084ed1f9._.js",
-      "static/chunks/src_pages_edit_[id]_tsx_5771e187._.js",
-      "static/chunks/src_pages_edit_[id]_tsx_e9b17c61._.js"
     ]
   },
   "devFiles": [],
