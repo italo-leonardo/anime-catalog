@@ -16,22 +16,6 @@
       "static/chunks/src_styles_globals_4738091e.css",
       "static/chunks/src_pages__app_5771e187._.js",
       "static/chunks/src_pages__app_57e7673b._.js"
-    ],
-    "/add": [
-      "static/chunks/node_modules_next_f03d281e._.js",
-      "static/chunks/node_modules_react-dom_82bb97c6._.js",
-      "static/chunks/node_modules_1b7400a8._.js",
-      "static/chunks/[root of the server]__5a5d84db._.js",
-      "static/chunks/src_pages_add_index_tsx_5771e187._.js",
-      "static/chunks/src_pages_add_index_tsx_23f6eb1f._.js"
-    ],
-    "/edit/[id]": [
-      "static/chunks/node_modules_next_f03d281e._.js",
-      "static/chunks/node_modules_react-dom_82bb97c6._.js",
-      "static/chunks/node_modules_1b7400a8._.js",
-      "static/chunks/[root of the server]__084ed1f9._.js",
-      "static/chunks/src_pages_edit_[id]_tsx_5771e187._.js",
-      "static/chunks/src_pages_edit_[id]_tsx_e9b17c61._.js"
     ]
   },
   "devFiles": [],
