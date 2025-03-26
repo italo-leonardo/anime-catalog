@@ -467,64 +467,43 @@ function triggerUpdate(msg) {
 
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
+// src/services/api.ts
 __turbopack_context__.s({
-    "api": (()=>api)
+    "default": (()=>__TURBOPACK__default__export__)
 });
-// Mock de dados (simula um banco de dados)
-let mockAnimes = [
-    {
-        id: '1',
-        title: 'Attack on Titan',
-        genre: 'Ação, Fantasia'
-    },
-    {
-        id: '2',
-        title: 'Demon Slayer',
-        genre: 'Ação, Aventura'
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/axios/lib/axios.js [client] (ecmascript)");
+;
+// 1. Configuração base do Axios
+const api = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"].create({
+    baseURL: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/animes',
+    timeout: 10000,
+    headers: {
+        'Content-Type': 'application/json'
     }
-];
-const api = {
-    // Busca todos os animes (simula uma API real)
-    getAnimes: async ()=>{
-        await new Promise((resolve)=>setTimeout(resolve, 500)); // Delay de 0.5s
-        return {
-            data: mockAnimes
-        };
-    },
-    // Deleta um anime
-    deleteAnime: async (id)=>{
-        mockAnimes = mockAnimes.filter((anime)=>anime.id !== id);
-        return {
-            data: {
-                success: true
-            }
-        };
-    },
-    addAnime: async (newAnime)=>{
-        await new Promise((resolve)=>setTimeout(resolve, 500)); // Simula delay
-        const anime = {
-            id: Date.now().toString(),
-            ...newAnime
-        };
-        mockAnimes.push(anime);
-        return {
-            data: anime
-        };
-    },
-    updateAnime: async (id, data)=>{
-        await new Promise((resolve)=>setTimeout(resolve, 500));
-        const index = mockAnimes.findIndex((anime)=>anime.id === id);
-        if (index !== -1) {
-            mockAnimes[index] = {
-                ...mockAnimes[index],
-                ...data
-            };
-        }
-        return {
-            data: mockAnimes[index]
-        };
+});
+// 2. Interceptores para tratamento global de erros
+api.interceptors.response.use((response)=>response, (error)=>{
+    if (error.response) {
+        console.error('Erro na resposta:', {
+            status: error.response.status,
+            data: error.response.data
+        });
+    } else if (error.request) {
+        console.error('Sem resposta do servidor:', error.request);
+    } else {
+        console.error('Erro na requisição:', error.message);
     }
+    return Promise.reject(error);
+});
+// 5. Implementação do serviço
+const apiService = {
+    getAnimes: ()=>api.get('/'),
+    addAnime: (data)=>api.post('/', data),
+    updateAnime: (id, data)=>api.put(`/${id}`, data),
+    deleteAnime: (id)=>api.delete(`/${id}`)
 };
+const __TURBOPACK__default__export__ = apiService;
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
 }
@@ -534,6 +513,7 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
+// pages/add/index.tsx
 __turbopack_context__.s({
     "default": (()=>AddAnime)
 });
@@ -541,7 +521,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/react/index.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/router.js [client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$head$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/head.js [client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/services/api.ts [client] (ecmascript)"); // Importação adicionada
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/services/api.ts [client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 ;
@@ -555,19 +535,37 @@ function AddAnime() {
         title: '',
         genre: ''
     });
-    const [isSubmitting, setIsSubmitting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(false); // Estado de loading
+    const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])('');
     const handleSubmit = async (e)=>{
         e.preventDefault();
-        setIsSubmitting(true); // Ativa o loading
-        try {
-            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["api"].addAnime(form);
-            router.push('/');
-        } catch (error) {
-            console.error('Erro ao cadastrar:', error);
-            alert('Erro ao cadastrar anime!');
-        } finally{
-            setIsSubmitting(false); // Desativa o loading
+        setLoading(true);
+        setError('');
+        // Validação simples
+        if (!form.title.trim() || !form.genre.trim()) {
+            setError('Preencha todos os campos');
+            setLoading(false);
+            return;
         }
+        try {
+            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["default"].addAnime({
+                title: form.title,
+                genre: form.genre
+            });
+            router.push('/'); // Volta para a lista após cadastro
+        } catch (err) {
+            setError('Erro ao cadastrar anime');
+            console.error(err);
+        } finally{
+            setLoading(false);
+        }
+    };
+    const handleChange = (e)=>{
+        const { name, value } = e.target;
+        setForm((prev)=>({
+                ...prev,
+                [name]: value
+            }));
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Fragment"], {
         children: [
@@ -576,162 +574,157 @@ function AddAnime() {
                     children: "Adicionar Anime"
                 }, void 0, false, {
                     fileName: "[project]/src/pages/add/index.tsx",
-                    lineNumber: 29,
+                    lineNumber: 53,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/pages/add/index.tsx",
-                lineNumber: 28,
+                lineNumber: 52,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "min-h-screen bg-[#F8F9FA] p-6",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "max-w-md mx-auto bg-white p-6 rounded-lg shadow-md",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                            className: "text-2xl font-bold text-[#EE0000] mb-4",
-                            children: "Adicionar Anime"
-                        }, void 0, false, {
-                            fileName: "[project]/src/pages/add/index.tsx",
-                            lineNumber: 34,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                            onSubmit: handleSubmit,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "mb-4",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-gray-700 mb-2",
-                                            children: "Título*"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/pages/add/index.tsx",
-                                            lineNumber: 37,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            value: form.title,
-                                            onChange: (e)=>setForm({
-                                                    ...form,
-                                                    title: e.target.value
-                                                }),
-                                            className: "w-full px-3 py-2 border rounded focus:ring-2 focus:ring-[#5FFBF1] focus:border-transparent",
-                                            placeholder: "Ex: Attack on Titan",
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/pages/add/index.tsx",
-                                            lineNumber: 38,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/pages/add/index.tsx",
-                                    lineNumber: 36,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "mb-6",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-gray-700 mb-2",
-                                            children: "Gênero*"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/pages/add/index.tsx",
-                                            lineNumber: 48,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            value: form.genre,
-                                            onChange: (e)=>setForm({
-                                                    ...form,
-                                                    genre: e.target.value
-                                                }),
-                                            className: "w-full px-3 py-2 border rounded focus:ring-2 focus:ring-[#5FFBF1] focus:border-transparent",
-                                            placeholder: "Ex: Ação, Fantasia",
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/pages/add/index.tsx",
-                                            lineNumber: 49,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/pages/add/index.tsx",
-                                    lineNumber: 47,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "submit",
-                                    disabled: isSubmitting,
-                                    className: `w-full bg-[#EE0000] text-white py-2 rounded hover:bg-red-700 transition flex justify-center items-center ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`,
-                                    children: isSubmitting ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Fragment"], {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                                className: "animate-spin -ml-1 mr-2 h-4 w-4 text-white",
-                                                xmlns: "http://www.w3.org/2000/svg",
-                                                fill: "none",
-                                                viewBox: "0 0 24 24",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("circle", {
-                                                        className: "opacity-25",
-                                                        cx: "12",
-                                                        cy: "12",
-                                                        r: "10",
-                                                        stroke: "currentColor",
-                                                        strokeWidth: "4"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/pages/add/index.tsx",
-                                                        lineNumber: 68,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
-                                                        className: "opacity-75",
-                                                        fill: "currentColor",
-                                                        d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/pages/add/index.tsx",
-                                                        lineNumber: 69,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/pages/add/index.tsx",
-                                                lineNumber: 67,
-                                                columnNumber: 19
-                                            }, this),
-                                            "Salvando..."
-                                        ]
-                                    }, void 0, true) : 'Salvar'
-                                }, void 0, false, {
-                                    fileName: "[project]/src/pages/add/index.tsx",
-                                    lineNumber: 58,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/pages/add/index.tsx",
-                            lineNumber: 35,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/pages/add/index.tsx",
-                    lineNumber: 33,
-                    columnNumber: 9
-                }, this)
-            }, void 0, false, {
+                className: "container mx-auto p-4 max-w-md",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                        className: "text-2xl font-bold mb-6",
+                        children: "Adicionar Novo Anime"
+                    }, void 0, false, {
+                        fileName: "[project]/src/pages/add/index.tsx",
+                        lineNumber: 57,
+                        columnNumber: 9
+                    }, this),
+                    error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4",
+                        children: error
+                    }, void 0, false, {
+                        fileName: "[project]/src/pages/add/index.tsx",
+                        lineNumber: 60,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                        onSubmit: handleSubmit,
+                        className: "space-y-4",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: "title",
+                                        className: "block text-sm font-medium text-gray-700",
+                                        children: "Título *"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/add/index.tsx",
+                                        lineNumber: 67,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        type: "text",
+                                        id: "title",
+                                        name: "title",
+                                        value: form.title,
+                                        onChange: handleChange,
+                                        className: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2",
+                                        placeholder: "Ex: Attack on Titan",
+                                        disabled: loading
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/add/index.tsx",
+                                        lineNumber: 70,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/pages/add/index.tsx",
+                                lineNumber: 66,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: "genre",
+                                        className: "block text-sm font-medium text-gray-700",
+                                        children: "Gênero *"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/add/index.tsx",
+                                        lineNumber: 83,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        type: "text",
+                                        id: "genre",
+                                        name: "genre",
+                                        value: form.genre,
+                                        onChange: handleChange,
+                                        className: "mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2",
+                                        placeholder: "Ex: Ação, Fantasia",
+                                        disabled: loading
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/add/index.tsx",
+                                        lineNumber: 86,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/pages/add/index.tsx",
+                                lineNumber: 82,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex justify-end space-x-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "button",
+                                        onClick: ()=>router.push('/'),
+                                        className: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50",
+                                        disabled: loading,
+                                        children: "Cancelar"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/add/index.tsx",
+                                        lineNumber: 99,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "submit",
+                                        className: "px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-blue-300",
+                                        disabled: loading,
+                                        children: loading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "inline-block animate-spin mr-2",
+                                                    children: "↻"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/pages/add/index.tsx",
+                                                    lineNumber: 115,
+                                                    columnNumber: 19
+                                                }, this),
+                                                "Salvando..."
+                                            ]
+                                        }, void 0, true) : 'Salvar Anime'
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/add/index.tsx",
+                                        lineNumber: 108,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/pages/add/index.tsx",
+                                lineNumber: 98,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/pages/add/index.tsx",
+                        lineNumber: 65,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
                 fileName: "[project]/src/pages/add/index.tsx",
-                lineNumber: 32,
+                lineNumber: 56,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true);
 }
-_s(AddAnime, "KxA+JrDuLaVDOHLwG6As2J71o/A=", false, function() {
+_s(AddAnime, "rnoGh4nuko1WK711920MUCr81Gw=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];

@@ -1,26 +1,50 @@
+// pages/add/index.tsx
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { api } from '../../services/api'; // Importação adicionada
+import api from '../../services/api';
 
 export default function AddAnime() {
   const router = useRouter();
-  const [form, setForm] = useState({ title: '', genre: '' });
-  const [isSubmitting, setIsSubmitting] = useState(false); // Estado de loading
+  const [form, setForm] = useState({
+    title: '',
+    genre: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true); // Ativa o loading
-    
-    try {
-      await api.addAnime(form);
-      router.push('/');
-    } catch (error) {
-      console.error('Erro ao cadastrar:', error);
-      alert('Erro ao cadastrar anime!');
-    } finally {
-      setIsSubmitting(false); // Desativa o loading
+    setLoading(true);
+    setError('');
+
+    // Validação simples
+    if (!form.title.trim() || !form.genre.trim()) {
+      setError('Preencha todos os campos');
+      setLoading(false);
+      return;
     }
+
+    try {
+      await api.addAnime({
+        title: form.title,
+        genre: form.genre
+      });
+      router.push('/'); // Volta para a lista após cadastro
+    } catch (err) {
+      setError('Erro ao cadastrar anime');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -29,53 +53,74 @@ export default function AddAnime() {
         <title>Adicionar Anime</title>
       </Head>
 
-      <div className="min-h-screen bg-[#F8F9FA] p-6">
-        <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold text-[#EE0000] mb-4">Adicionar Anime</h1>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Título*</label>
-              <input
-                type="text"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-[#5FFBF1] focus:border-transparent"
-                placeholder="Ex: Attack on Titan"
-                required
-              />
-            </div>
-            <div className="mb-6">
-              <label className="block text-gray-700 mb-2">Gênero*</label>
-              <input
-                type="text"
-                value={form.genre}
-                onChange={(e) => setForm({ ...form, genre: e.target.value })}
-                className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-[#5FFBF1] focus:border-transparent"
-                placeholder="Ex: Ação, Fantasia"
-                required
-              />
-            </div>
+      <div className="container mx-auto p-4 max-w-md">
+        <h1 className="text-2xl font-bold mb-6">Adicionar Novo Anime</h1>
+        
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+              Título *
+            </label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              placeholder="Ex: Attack on Titan"
+              disabled={loading}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="genre" className="block text-sm font-medium text-gray-700">
+              Gênero *
+            </label>
+            <input
+              type="text"
+              id="genre"
+              name="genre"
+              value={form.genre}
+              onChange={handleChange}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              placeholder="Ex: Ação, Fantasia"
+              disabled={loading}
+            />
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+            
             <button
               type="submit"
-              disabled={isSubmitting} // Desabilita durante o carregamento
-              className={`w-full bg-[#EE0000] text-white py-2 rounded hover:bg-red-700 transition flex justify-center items-center ${
-                isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-              }`}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-blue-300"
+              disabled={loading}
             >
-              {isSubmitting ? (
+              {loading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
+                  <span className="inline-block animate-spin mr-2">↻</span>
                   Salvando...
                 </>
               ) : (
-                'Salvar'
+                'Salvar Anime'
               )}
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </>
   );

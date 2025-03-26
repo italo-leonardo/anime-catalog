@@ -1,74 +1,62 @@
-// import Image from "next/image";
-// import { Geist, Geist_Mono } from "next/font/google";
-
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
-
+// pages/index.tsx
 import { useState, useEffect } from 'react';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { SearchBar } from '../components/SearchBar';
-import { AnimeCard } from '../components/AnimeCard';
-import { api } from '../services/api';
+import Head from 'next/head';
+import api from '../services/api';
 
 interface Anime {
   id: string;
   title: string;
   genre: string;
+  createdAt: string;
 }
 
 export default function Home() {
-  const router = useRouter();
   const [animes, setAnimes] = useState<Anime[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
 
   // Carrega os animes ao iniciar
   useEffect(() => {
-    const loadAnimes = async () => {
+    async function loadAnimes() {
       try {
         const response = await api.getAnimes();
         setAnimes(response.data);
-      } catch (error) {
-        console.error('Erro ao carregar animes:', error);
+      } catch (err) {
+        setError('Falha ao carregar animes');
+        console.error(err);
       } finally {
         setLoading(false);
       }
-    };
+    }
     loadAnimes();
   }, []);
 
-  // Filtra os animes conforme o termo de busca
-  const filteredAnimes = animes.filter(
-    (anime) =>
-      anime.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      anime.genre.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-  };
-
+  // Função para deletar anime
   const handleDelete = async (id: string) => {
-    try {
-      await api.deleteAnime(id);
-      setAnimes(animes.filter((anime) => anime.id !== id));
-    } catch (error) {
-      console.error('Erro ao deletar:', error);
+    if (confirm('Tem certeza que deseja excluir este anime?')) {
+      try {
+        await api.deleteAnime(id);
+        setAnimes(animes.filter(anime => anime.id !== id));
+      } catch (err) {
+        alert('Erro ao excluir anime');
+      }
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center">
-        <p className="text-xl">Carregando...</p>
+      <div className="flex justify-center items-center h-screen">
+        <p>Carregando...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-red-500">{error}</p>
       </div>
     );
   }
@@ -77,58 +65,47 @@ export default function Home() {
     <>
       <Head>
         <title>Catálogo de Animes</title>
-        <meta name="description" content="Gerencie sua coleção de animes" />
       </Head>
 
-      <div className="min-h-screen bg-[#F8F9FA] p-6">
-        <div className="max-w-4xl mx-auto">
-          <header className="mb-8 text-center">
-            <h1 className="text-4xl font-bold text-[#EE0000] mb-2">
-              Meu Catálogo de Animes
-            </h1>
-            <p className="text-gray-600">
-              Gerencie sua lista de animes favoritos
-            </p>
-          </header>
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold text-center mb-8">Meu Catálogo de Animes</h1>
+        
+        <button
+          onClick={() => router.push('/add')}
+          className="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600"
+        >
+          Adicionar Anime
+        </button>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-[#86A8E7]">
-            <SearchBar onSearch={handleSearch} />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-              {filteredAnimes.map((anime) => (
-                <AnimeCard
-                  key={anime.id}
-                  id={anime.id}
-                  title={anime.title}
-                  genre={anime.genre}
-                  onEdit={(id) => router.push(`/edit/${id}`)}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-
-            <div className="mt-8 text-center">
-              <button
-                onClick={() => router.push('/add')}
-                className="bg-[#EE0000] text-white px-6 py-3 rounded-lg shadow-lg hover:bg-red-700 transition flex items-center mx-auto"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-2"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Adicionar Anime
-              </button>
-            </div>
+        {animes.length === 0 ? (
+          <p className="text-center">Nenhum anime cadastrado ainda.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {animes.map((anime) => (
+              <div key={anime.id} className="border p-4 rounded shadow">
+                <h2 className="text-xl font-semibold">{anime.title}</h2>
+                <p className="text-gray-600">{anime.genre}</p>
+                <p className="text-sm text-gray-400">
+                  Cadastrado em: {new Date(anime.createdAt).toLocaleDateString()}
+                </p>
+                <div className="flex justify-end space-x-2 mt-2">
+                  <button
+                    onClick={() => router.push(`/edit/${anime.id}`)}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(anime.id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
       </div>
     </>
   );

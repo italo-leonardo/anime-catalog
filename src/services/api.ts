@@ -1,40 +1,60 @@
-import axios from 'axios';
+// src/services/api.ts
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
-// Mock de dados (simula um banco de dados)
-let mockAnimes = [
-  { id: '1', title: 'Attack on Titan', genre: 'Ação, Fantasia' },
-  { id: '2', title: 'Demon Slayer', genre: 'Ação, Aventura' },
-];
-
-export const api = {
-  // Busca todos os animes (simula uma API real)
-  getAnimes: async () => {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Delay de 0.5s
-    return { data: mockAnimes };
+// 1. Configuração base do Axios
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/animes',
+  timeout: 10000, // 10 segundos
+  headers: {
+    'Content-Type': 'application/json',
   },
+});
 
-  // Deleta um anime
-  deleteAnime: async (id: string) => {
-    mockAnimes = mockAnimes.filter(anime => anime.id !== id);
-    return { data: { success: true } };
-  },
-
-  addAnime: async (newAnime: { title: string; genre: string }) => {
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simula delay
-    const anime = { 
-      id: Date.now().toString(), // Gera um ID único
-      ...newAnime 
-    };
-    mockAnimes.push(anime);
-    return { data: anime };
-  },
-
-  updateAnime: async (id: string, data: { title: string; genre: string }) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const index = mockAnimes.findIndex(anime => anime.id === id);
-    if (index !== -1) {
-      mockAnimes[index] = { ...mockAnimes[index], ...data };
+// 2. Interceptores para tratamento global de erros
+api.interceptors.response.use(
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
+    if (error.response) {
+      console.error('Erro na resposta:', {
+        status: error.response.status,
+        data: error.response.data,
+      });
+    } else if (error.request) {
+      console.error('Sem resposta do servidor:', error.request);
+    } else {
+      console.error('Erro na requisição:', error.message);
     }
-    return { data: mockAnimes[index] };
+    return Promise.reject(error);
   }
+);
+
+// 3. Tipagem das respostas
+interface Anime {
+  id: string;
+  title: string;
+  genre: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 4. Interface do serviço
+interface ApiService {
+  getAnimes: () => Promise<AxiosResponse<Anime[]>>;
+  addAnime: (data: Omit<Anime, 'id' | 'createdAt' | 'updatedAt'>) => Promise<AxiosResponse<Anime>>;
+  updateAnime: (id: string, data: Partial<Omit<Anime, 'id' | 'createdAt'>>) => Promise<AxiosResponse<Anime>>;
+  deleteAnime: (id: string) => Promise<AxiosResponse<void>>;
+}
+
+// 5. Implementação do serviço
+const apiService: ApiService = {
+  getAnimes: () => api.get('/'),
+
+  addAnime: (data) => api.post('/', data),
+
+  updateAnime: (id, data) => api.put(`/${id}`, data),
+
+  deleteAnime: (id) => api.delete(`/${id}`),
 };
+
+// 6. Exportação padrão
+export default apiService;

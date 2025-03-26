@@ -1,47 +1,80 @@
+// src/pages/edit/[id].tsx
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { api } from '../../services/api';
+import api from '../../services/api';
+
+// Tipagem alinhada com a interface Anime do api.ts
+interface AnimeFormData {
+  title: string;
+  genre: string;
+}
 
 export default function EditAnime() {
   const router = useRouter();
   const { id } = router.query;
-  const [form, setForm] = useState({ title: '', genre: '' });
+  const [form, setForm] = useState<AnimeFormData>({ title: '', genre: '' });
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Carrega os dados do anime ao iniciar
+  // Carrega os dados do anime para edição
   useEffect(() => {
-    const loadAnime = async () => {
+    if (!id) return;
+
+    const loadAnimeData = async () => {
       try {
         const response = await api.getAnimes();
-        const anime = response.data.find((a: any) => a.id === id);
-        if (anime) {
-          setForm({ title: anime.title, genre: anime.genre });
+        const animeToEdit = response.data.find((anime) => anime.id === id);
+        
+        if (animeToEdit) {
+          setForm({
+            title: animeToEdit.title,
+            genre: animeToEdit.genre
+          });
         }
       } catch (error) {
         console.error('Erro ao carregar anime:', error);
+        alert('Erro ao carregar dados do anime');
       } finally {
         setIsLoading(false);
       }
     };
-    if (id) loadAnime();
+
+    loadAnimeData();
   }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!id || isSubmitting) return;
+
+    setIsSubmitting(true);
+
     try {
-      await api.updateAnime(id as string, form);
+      // Ajuste para enviar apenas os campos editáveis conforme a interface ApiService
+      const updateData: Partial<AnimeFormData> = {
+        title: form.title,
+        genre: form.genre
+      };
+
+      await api.updateAnime(id as string, updateData);
       router.push('/');
     } catch (error) {
-      console.error('Erro ao atualizar:', error);
-      alert('Erro ao salvar alterações!');
+      console.error('Erro na atualização:', error);
+      alert('Erro ao salvar alterações');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center">
-        <p className="text-xl">Carregando...</p>
+      <div className="flex justify-center items-center h-screen">
+        <p>Carregando dados do anime...</p>
       </div>
     );
   }
@@ -52,38 +85,60 @@ export default function EditAnime() {
         <title>Editar Anime</title>
       </Head>
 
-      <div className="min-h-screen bg-[#F8F9FA] p-6">
-        <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold text-[#EE0000] mb-4">Editar Anime</h1>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label className="block text-gray-700 mb-2">Título*</label>
-              <input
-                type="text"
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-[#5FFBF1]"
-                required
-              />
-            </div>
-            <div className="mb-6">
-              <label className="block text-gray-700 mb-2">Gênero*</label>
-              <input
-                type="text"
-                value={form.genre}
-                onChange={(e) => setForm({ ...form, genre: e.target.value })}
-                className="w-full px-3 py-2 border rounded focus:ring-2 focus:ring-[#5FFBF1]"
-                required
-              />
-            </div>
+      <div className="max-w-md mx-auto p-4">
+        <h1 className="text-2xl font-bold mb-6">Editar Anime</h1>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="title" className="block mb-2 font-medium">
+              Título
+            </label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              value={form.title}
+              onChange={handleChange}
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+              required
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="genre" className="block mb-2 font-medium">
+              Gênero
+            </label>
+            <input
+              id="genre"
+              name="genre"
+              type="text"
+              value={form.genre}
+              onChange={handleChange}
+              className="w-full p-2 border rounded focus:ring-2 focus:ring-blue-500"
+              required
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div className="flex justify-end space-x-3 pt-4">
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              className="px-4 py-2 border rounded hover:bg-gray-50"
+              disabled={isSubmitting}
+            >
+              Cancelar
+            </button>
             <button
               type="submit"
-              className="w-full bg-[#EE0000] text-white py-2 rounded hover:bg-red-700"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300"
+              disabled={isSubmitting}
             >
-              Salvar Alterações
+              {isSubmitting ? 'Salvando...' : 'Salvar Alterações'}
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </>
   );

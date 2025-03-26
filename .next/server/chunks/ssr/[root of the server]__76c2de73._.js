@@ -157,69 +157,10 @@ const mod = __turbopack_context__.x("next/head.js", () => require("next/head.js"
 
 module.exports = mod;
 }}),
-"[project]/src/services/api.ts [ssr] (ecmascript)": ((__turbopack_context__) => {
-"use strict";
+"[project]/src/services/api.ts [ssr] (ecmascript)": (function(__turbopack_context__) {
 
-var { g: global, __dirname } = __turbopack_context__;
+var { g: global, __dirname, m: module, e: exports } = __turbopack_context__;
 {
-__turbopack_context__.s({
-    "api": (()=>api)
-});
-// Mock de dados (simula um banco de dados)
-let mockAnimes = [
-    {
-        id: '1',
-        title: 'Attack on Titan',
-        genre: 'Ação, Fantasia'
-    },
-    {
-        id: '2',
-        title: 'Demon Slayer',
-        genre: 'Ação, Aventura'
-    }
-];
-const api = {
-    // Busca todos os animes (simula uma API real)
-    getAnimes: async ()=>{
-        await new Promise((resolve)=>setTimeout(resolve, 500)); // Delay de 0.5s
-        return {
-            data: mockAnimes
-        };
-    },
-    // Deleta um anime
-    deleteAnime: async (id)=>{
-        mockAnimes = mockAnimes.filter((anime)=>anime.id !== id);
-        return {
-            data: {
-                success: true
-            }
-        };
-    },
-    addAnime: async (newAnime)=>{
-        await new Promise((resolve)=>setTimeout(resolve, 500)); // Simula delay
-        const anime = {
-            id: Date.now().toString(),
-            ...newAnime
-        };
-        mockAnimes.push(anime);
-        return {
-            data: anime
-        };
-    },
-    updateAnime: async (id, data)=>{
-        await new Promise((resolve)=>setTimeout(resolve, 500));
-        const index = mockAnimes.findIndex((anime)=>anime.id === id);
-        if (index !== -1) {
-            mockAnimes[index] = {
-                ...mockAnimes[index],
-                ...data
-            };
-        }
-        return {
-            data: mockAnimes[index]
-        };
-    }
-};
 }}),
 "[project]/src/pages/edit/[id].tsx [ssr] (ecmascript)": ((__turbopack_context__) => {
 "use strict";
@@ -251,7 +192,7 @@ function EditAnime() {
     (0, __TURBOPACK__imported__module__$5b$externals$5d2f$react__$5b$external$5d$__$28$react$2c$__cjs$29$__["useEffect"])(()=>{
         const loadAnime = async ()=>{
             try {
-                const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["api"].getAnimes();
+                const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["default"].getAnimes();
                 const anime = response.data.find((a)=>a.id === id);
                 if (anime) {
                     setForm({
@@ -272,7 +213,7 @@ function EditAnime() {
     const handleSubmit = async (e)=>{
         e.preventDefault();
         try {
-            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["api"].updateAnime(id, form);
+            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$ssr$5d$__$28$ecmascript$29$__["default"].updateAnime(id, form);
             router.push('/');
         } catch (error) {
             console.error('Erro ao atualizar:', error);

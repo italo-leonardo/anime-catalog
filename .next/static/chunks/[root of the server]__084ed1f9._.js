@@ -467,64 +467,43 @@ function triggerUpdate(msg) {
 
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
+// src/services/api.ts
 __turbopack_context__.s({
-    "api": (()=>api)
+    "default": (()=>__TURBOPACK__default__export__)
 });
-// Mock de dados (simula um banco de dados)
-let mockAnimes = [
-    {
-        id: '1',
-        title: 'Attack on Titan',
-        genre: 'Ação, Fantasia'
-    },
-    {
-        id: '2',
-        title: 'Demon Slayer',
-        genre: 'Ação, Aventura'
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/build/polyfills/process.js [client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/axios/lib/axios.js [client] (ecmascript)");
+;
+// 1. Configuração base do Axios
+const api = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"].create({
+    baseURL: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/animes',
+    timeout: 10000,
+    headers: {
+        'Content-Type': 'application/json'
     }
-];
-const api = {
-    // Busca todos os animes (simula uma API real)
-    getAnimes: async ()=>{
-        await new Promise((resolve)=>setTimeout(resolve, 500)); // Delay de 0.5s
-        return {
-            data: mockAnimes
-        };
-    },
-    // Deleta um anime
-    deleteAnime: async (id)=>{
-        mockAnimes = mockAnimes.filter((anime)=>anime.id !== id);
-        return {
-            data: {
-                success: true
-            }
-        };
-    },
-    addAnime: async (newAnime)=>{
-        await new Promise((resolve)=>setTimeout(resolve, 500)); // Simula delay
-        const anime = {
-            id: Date.now().toString(),
-            ...newAnime
-        };
-        mockAnimes.push(anime);
-        return {
-            data: anime
-        };
-    },
-    updateAnime: async (id, data)=>{
-        await new Promise((resolve)=>setTimeout(resolve, 500));
-        const index = mockAnimes.findIndex((anime)=>anime.id === id);
-        if (index !== -1) {
-            mockAnimes[index] = {
-                ...mockAnimes[index],
-                ...data
-            };
-        }
-        return {
-            data: mockAnimes[index]
-        };
+});
+// 2. Interceptores para tratamento global de erros
+api.interceptors.response.use((response)=>response, (error)=>{
+    if (error.response) {
+        console.error('Erro na resposta:', {
+            status: error.response.status,
+            data: error.response.data
+        });
+    } else if (error.request) {
+        console.error('Sem resposta do servidor:', error.request);
+    } else {
+        console.error('Erro na requisição:', error.message);
     }
+    return Promise.reject(error);
+});
+// 5. Implementação do serviço
+const apiService = {
+    getAnimes: ()=>api.get('/'),
+    addAnime: (data)=>api.post('/', data),
+    updateAnime: (id, data)=>api.put(`/${id}`, data),
+    deleteAnime: (id)=>api.delete(`/${id}`)
 };
+const __TURBOPACK__default__export__ = apiService;
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(module, globalThis.$RefreshHelpers$);
 }
@@ -534,6 +513,7 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 
 var { g: global, __dirname, k: __turbopack_refresh__, m: module } = __turbopack_context__;
 {
+// src/pages/edit/[id].tsx
 __turbopack_context__.s({
     "default": (()=>EditAnime)
 });
@@ -557,58 +537,76 @@ function EditAnime() {
         genre: ''
     });
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(true);
-    // Carrega os dados do anime ao iniciar
+    const [isSubmitting, setIsSubmitting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Carrega os dados do anime para edição
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$index$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "EditAnime.useEffect": ()=>{
-            const loadAnime = {
-                "EditAnime.useEffect.loadAnime": async ()=>{
+            if (!id) return;
+            const loadAnimeData = {
+                "EditAnime.useEffect.loadAnimeData": async ()=>{
                     try {
-                        const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["api"].getAnimes();
-                        const anime = response.data.find({
-                            "EditAnime.useEffect.loadAnime.anime": (a)=>a.id === id
-                        }["EditAnime.useEffect.loadAnime.anime"]);
-                        if (anime) {
+                        const response = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["default"].getAnimes();
+                        const animeToEdit = response.data.find({
+                            "EditAnime.useEffect.loadAnimeData.animeToEdit": (anime)=>anime.id === id
+                        }["EditAnime.useEffect.loadAnimeData.animeToEdit"]);
+                        if (animeToEdit) {
                             setForm({
-                                title: anime.title,
-                                genre: anime.genre
+                                title: animeToEdit.title,
+                                genre: animeToEdit.genre
                             });
                         }
                     } catch (error) {
                         console.error('Erro ao carregar anime:', error);
+                        alert('Erro ao carregar dados do anime');
                     } finally{
                         setIsLoading(false);
                     }
                 }
-            }["EditAnime.useEffect.loadAnime"];
-            if (id) loadAnime();
+            }["EditAnime.useEffect.loadAnimeData"];
+            loadAnimeData();
         }
     }["EditAnime.useEffect"], [
         id
     ]);
     const handleSubmit = async (e)=>{
         e.preventDefault();
+        if (!id || isSubmitting) return;
+        setIsSubmitting(true);
         try {
-            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["api"].updateAnime(id, form);
+            // Ajuste para enviar apenas os campos editáveis conforme a interface ApiService
+            const updateData = {
+                title: form.title,
+                genre: form.genre
+            };
+            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$services$2f$api$2e$ts__$5b$client$5d$__$28$ecmascript$29$__["default"].updateAnime(id, updateData);
             router.push('/');
         } catch (error) {
-            console.error('Erro ao atualizar:', error);
-            alert('Erro ao salvar alterações!');
+            console.error('Erro na atualização:', error);
+            alert('Erro ao salvar alterações');
+        } finally{
+            setIsSubmitting(false);
         }
+    };
+    const handleChange = (e)=>{
+        const { name, value } = e.target;
+        setForm((prev)=>({
+                ...prev,
+                [name]: value
+            }));
     };
     if (isLoading) {
         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "min-h-screen bg-[#F8F9FA] flex items-center justify-center",
+            className: "flex justify-center items-center h-screen",
             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                className: "text-xl",
-                children: "Carregando..."
+                children: "Carregando dados do anime..."
             }, void 0, false, {
                 fileName: "[project]/src/pages/edit/[id].tsx",
-                lineNumber: 44,
+                lineNumber: 77,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/src/pages/edit/[id].tsx",
-            lineNumber: 43,
+            lineNumber: 76,
             columnNumber: 7
         }, this);
     }
@@ -619,122 +617,137 @@ function EditAnime() {
                     children: "Editar Anime"
                 }, void 0, false, {
                     fileName: "[project]/src/pages/edit/[id].tsx",
-                    lineNumber: 52,
+                    lineNumber: 85,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/pages/edit/[id].tsx",
-                lineNumber: 51,
+                lineNumber: 84,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "min-h-screen bg-[#F8F9FA] p-6",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "max-w-md mx-auto bg-white p-6 rounded-lg shadow-md",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                            className: "text-2xl font-bold text-[#EE0000] mb-4",
-                            children: "Editar Anime"
-                        }, void 0, false, {
-                            fileName: "[project]/src/pages/edit/[id].tsx",
-                            lineNumber: 57,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                            onSubmit: handleSubmit,
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "mb-4",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-gray-700 mb-2",
-                                            children: "Título*"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/pages/edit/[id].tsx",
-                                            lineNumber: 60,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            value: form.title,
-                                            onChange: (e)=>setForm({
-                                                    ...form,
-                                                    title: e.target.value
-                                                }),
-                                            className: "w-full px-3 py-2 border rounded focus:ring-2 focus:ring-[#5FFBF1]",
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/pages/edit/[id].tsx",
-                                            lineNumber: 61,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/pages/edit/[id].tsx",
-                                    lineNumber: 59,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "mb-6",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-gray-700 mb-2",
-                                            children: "Gênero*"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/pages/edit/[id].tsx",
-                                            lineNumber: 70,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            value: form.genre,
-                                            onChange: (e)=>setForm({
-                                                    ...form,
-                                                    genre: e.target.value
-                                                }),
-                                            className: "w-full px-3 py-2 border rounded focus:ring-2 focus:ring-[#5FFBF1]",
-                                            required: true
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/pages/edit/[id].tsx",
-                                            lineNumber: 71,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/pages/edit/[id].tsx",
-                                    lineNumber: 69,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "submit",
-                                    className: "w-full bg-[#EE0000] text-white py-2 rounded hover:bg-red-700",
-                                    children: "Salvar Alterações"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/pages/edit/[id].tsx",
-                                    lineNumber: 79,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/pages/edit/[id].tsx",
-                            lineNumber: 58,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/pages/edit/[id].tsx",
-                    lineNumber: 56,
-                    columnNumber: 9
-                }, this)
-            }, void 0, false, {
+                className: "max-w-md mx-auto p-4",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                        className: "text-2xl font-bold mb-6",
+                        children: "Editar Anime"
+                    }, void 0, false, {
+                        fileName: "[project]/src/pages/edit/[id].tsx",
+                        lineNumber: 89,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                        onSubmit: handleSubmit,
+                        className: "space-y-4",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: "title",
+                                        className: "block mb-2 font-medium",
+                                        children: "Título"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/edit/[id].tsx",
+                                        lineNumber: 93,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: "title",
+                                        name: "title",
+                                        type: "text",
+                                        value: form.title,
+                                        onChange: handleChange,
+                                        className: "w-full p-2 border rounded focus:ring-2 focus:ring-blue-500",
+                                        required: true,
+                                        disabled: isSubmitting
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/edit/[id].tsx",
+                                        lineNumber: 96,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/pages/edit/[id].tsx",
+                                lineNumber: 92,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: "genre",
+                                        className: "block mb-2 font-medium",
+                                        children: "Gênero"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/edit/[id].tsx",
+                                        lineNumber: 109,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: "genre",
+                                        name: "genre",
+                                        type: "text",
+                                        value: form.genre,
+                                        onChange: handleChange,
+                                        className: "w-full p-2 border rounded focus:ring-2 focus:ring-blue-500",
+                                        required: true,
+                                        disabled: isSubmitting
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/edit/[id].tsx",
+                                        lineNumber: 112,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/pages/edit/[id].tsx",
+                                lineNumber: 108,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "flex justify-end space-x-3 pt-4",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "button",
+                                        onClick: ()=>router.push('/'),
+                                        className: "px-4 py-2 border rounded hover:bg-gray-50",
+                                        disabled: isSubmitting,
+                                        children: "Cancelar"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/edit/[id].tsx",
+                                        lineNumber: 125,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "submit",
+                                        className: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-blue-300",
+                                        disabled: isSubmitting,
+                                        children: isSubmitting ? 'Salvando...' : 'Salvar Alterações'
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/pages/edit/[id].tsx",
+                                        lineNumber: 133,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/pages/edit/[id].tsx",
+                                lineNumber: 124,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/pages/edit/[id].tsx",
+                        lineNumber: 91,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
                 fileName: "[project]/src/pages/edit/[id].tsx",
-                lineNumber: 55,
+                lineNumber: 88,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true);
 }
-_s(EditAnime, "4Ye67Evq9JiQVTLHDxxaQpSsrN4=", false, function() {
+_s(EditAnime, "KpTWx2EqsiCwCuaB+3xjNcToWVs=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$router$2e$js__$5b$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
