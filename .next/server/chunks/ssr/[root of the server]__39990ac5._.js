@@ -121,16 +121,6 @@ function App({ Component, pageProps }) {
 
 var { g: global, __dirname, m: module, e: exports } = __turbopack_context__;
 {
-// import Image from "next/image";
-// import { Geist, Geist_Mono } from "next/font/google";
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
 }}),
 
 };

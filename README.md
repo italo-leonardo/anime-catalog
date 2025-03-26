@@ -1,40 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Catálogo de Animes
 
-## Getting Started
+Aplicação web full-stack para gerenciamento de um catálogo de animes com funcionalidades CRUD.
 
-First, run the development server:
+## 🛠 Tecnologias
 
+### Backend (Repositório: `Backend-anime`)
+- **NestJS**: Framework Node.js para construção eficiente de APIs
+- **Prisma**: ORM para interação com banco de dados
+- **SQLite**: Banco de dados relacional embutido
+- **TypeScript**: Tipagem estática
+
+### Frontend (Repositório: `anime-catalog`)
+- **Next.js**: Framework React com SSR
+- **Tailwind CSS**: Estilização utilitária
+- **Axios**: Cliente HTTP
+- **TypeScript**: Tipagem estática
+
+## 📋 Pré-requisitos
+
+- Node.js v18+
+- npm ou yarn
+- Git (opcional)
+
+---
+
+## 🚀 Configuração do Backend
+
+### 1. Clonar repositório
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+git clone https://github.com/seu-usuario/Backend-anime.git
+cd Backend-anime
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Instalar dependências
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+npm install
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+3. Configurar banco de dados
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+npx prisma migrate dev --name init
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Iniciar servidor
 
-## Learn More
+npm run start:dev
 
-To learn more about Next.js, take a look at the following resources:
+🔌 Endpoints disponíveis
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+Método	Endpoint	Descrição
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+GET	/animes	Listar todos
+POST	/animes	Criar novo anime
+PUT	/animes/:id	Atualizar anime
+DELETE	/animes/:id	Excluir anime
 
-## Deploy on Vercel
+Acesse a documentação da API em: http://localhost:3000/docs (se usar Swagger)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+🎨 Configuração do Frontend
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+1. Clonar repositório
+
+    git clone https://github.com/seu-usuario/anime-catalog.git
+    cd anime-catalog
+
+2. Instalar dependências
+
+    npm install
+
+3. Configurar variáveis de ambiente
+
+    NEXT_PUBLIC_API_URL=http://localhost:3000/animes
+
+4. Iniciar aplicação
+     npm run dev
+
+Acesse no navegador: http://localhost:3001
+
+Desenvolvido por Italo Leonardo
+📧 Contato: italoleonardonv@gmail.com
+🔗 GitHub: Italo_Leonardo
